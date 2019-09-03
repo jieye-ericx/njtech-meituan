@@ -2,10 +2,7 @@
   <div>
     <el-container direction="vertical">
       <MainHeader></MainHeader>
-      <el-container>
-        <Aside></Aside>
-        <FoodsList></FoodsList>
-      </el-container>
+      
       <Footer></Footer>
     </el-container>
   </div>

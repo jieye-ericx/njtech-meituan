@@ -56,37 +56,40 @@
       </el-menu>
     </el-aside>
     <el-main>
-      <!-- <el-row> -->
-      <el-col
-        :span="4"
-        v-for="(good, index) in goodsList"
-        :key="good.src"
-        :offset="index > 0 ? 2 : 0"
-      >
+      <router-link :to="'/foodinfo/'+good.id" tag="div" v-for="(good) in goodsList" :key="good.id">
         <el-card :body-style="{ padding: '1px' }">
-          <img
-            src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            class="image"
-          />
+          <img :src="good.img" class="image" />
           <div>
             <div class="name-price">
-              <span>{{good.name}}</span>
+              <span class="s-name">{{good.name}}+{{good.id}}</span>
               <span class="s-price">¥{{good.price}}</span>
             </div>
-            <div class="bottom clearfix">
-              <time class="time">{{ currentDate|dateFormat('YYYY-MM-DD')}}</time>
+            <div class="category-more">
+              <span class="s-category">{{good.category}}</span>
               <el-button type="text" class="button">了解更多</el-button>
             </div>
           </div>
         </el-card>
-      </el-col>
-      <!-- </el-row> -->
+      </router-link>
     </el-main>
   </el-container>
 </template>
 
 <script>
 export default {
+  created() {
+    for (var i = 0; i < 100; i++) {
+      var good = {
+        img:
+          "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
+        name: "汉堡",
+        category: "快餐",
+        price: "100",
+        id: i
+      };
+      this.goodsList.push(good);
+    }
+  },
   data() {
     const item = {
       date: "2016-05-02",
@@ -102,7 +105,7 @@ export default {
     };
     return {
       tableData: Array(20).fill(item),
-      goodsList: Array(100).fill(goods),
+      goodsList: [],
       currentDate: new Date()
     };
   }
@@ -113,6 +116,11 @@ export default {
 .el-aside {
   color: #333;
   background-color: #ffffff;
+  // .el-menu {
+  //   border: 0.1px solid #ccc;
+  //   box-shadow: 0 0 8px #ccc;
+  //   border-radius: 4%;
+  // }
 }
 .time {
   font-size: 15px;
@@ -133,36 +141,55 @@ export default {
   width: 100%;
   display: block;
 }
-.name-price {
-  padding: 4px;
-  // text-align: left;
-  display: flex;
+.el-main {
+  flex-wrap: wrap;
+  padding: 7px;
   justify-content: space-between;
-  .s-price {
-    font-weight: 900;
-    color: red;
-  }
-}
-.clearfix {
   display: flex;
 
-  justify-content: space-between;
-  .time {
-    // text-align: left;
-    padding: 2px;
+  .el-card {
+    border: 0.1px solid #ccc;
+    box-shadow: 0 0 8px #ccc;
+    border-radius: 4%;
+    margin: 5px;
+    width: 220px;
+    height: 290px;
+    flex-direction: column;
+    justify-content: space-between;
+    .name-price {
+      display: flex;
+      justify-content: space-between;
+      .s-name {
+        font-size: 18px;
+      }
+
+      .s-price {
+        padding-top: 24px;
+        color: red;
+        font-weight: bold;
+        font-size: 20px;
+      }
+    }
+    .category-more {
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      .s-category {
+        font-size: 12px;
+      }
+      .el-button {
+      }
+    }
   }
-  el-button {
-    padding: 2px;
-    // text-align: right;
-  }
-}
-.clearfix:before,
-.clearfix:after {
-  display: table;
-  content: "";
 }
 
-.clearfix:after {
-  clear: both;
-}
+// .clearfix:before,
+// .clearfix:after {
+//   display: table;
+//   content: "";
+// }
+
+// .clearfix:after {
+//   clear: both;
+// }
 </style>
