@@ -1,15 +1,17 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
-
+import index from '@/layout/index'
+import CartList from "@/layout/body/Cart.vue";
+import OrderList from "@/layout/body/OrderList.vue";
+import FoodsList from "@/layout/body/FoodsList.vue";
 Vue.use(Router)
 
 export default new Router({
   routes: [
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    }
+    { path: '/', redirect: '/index' },
+    { path: '/index', component: index },
+    { path: '/cart', component: CartList },
+    { path: '/orderlist', component: OrderList },
+    { path: '/foodslist', component: FoodsList }
   ]
 })
