@@ -8,12 +8,12 @@
         @select="handleSelect"
         background-color="#323232"
         text-color="#fff"
-        active-text-color="#fff"
-        style="height:44px;padding-left:140px;"
+        active-text-color="rgb(181,181,181)"
+        style="height:44px;margin-left:20%;"
       >
-        <el-menu-item index="4">
+        <el-menu-item index="0" >
           <router-link to="/foodslist" tag="div">
-            <i class="el-icon-platform-eleme"></i>
+            <i class="el-icon-platform-eleme" style="color:#fff;"></i>
           </router-link>
         </el-menu-item>
         <el-menu-item index="1">

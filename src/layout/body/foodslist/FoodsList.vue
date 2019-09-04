@@ -65,8 +65,8 @@ export default {
 
 <style lang="scss" scoped>
 .el-container {
-  margin-top: 20px;
-  width: 80%;
+  margin-top: 25px;
+  margin-right: 10%;
   margin-left: 10%;
 }
 .el-aside {

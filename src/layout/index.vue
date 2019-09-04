@@ -2,7 +2,6 @@
   <div>
     <div>
       <MainHeader></MainHeader>
-      
       <Footer></Footer>
     </div>
   </div>
