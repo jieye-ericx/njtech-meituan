@@ -1,14 +1,14 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="16" :offset="2">
+      <el-col :span="16" :offset="3">
         <!-- <h1 style="text-align:left;margin-bottom:0;">团购详情</h1> -->
         <el-page-header @back="goBack" content="团购详情" style="margin-top:30px;"></el-page-header>
         <el-divider content-position="left">工大美团</el-divider>
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="8" :offset="2" style="text-align:left">
+      <el-col :span="8" :offset="3" style="text-align:left">
         <h1 style="text-align:left;margin-bottom:0;">{{goodInfo.title}}</h1>
         <h2 style="margin-top:5px;">RMB {{goodInfo.price}}</h2>
         <el-tag type="info">{{goodInfo.tag}}</el-tag>
@@ -17,7 +17,7 @@
           <el-button type="primary" plain size="small" style="height:80%;">加入购物袋</el-button>
         </div>
       </el-col>
-      <el-col :span="12" push="4">
+      <el-col :span="12" :push="3">
         <el-carousel :interval="4000" type="card" height="200px" arrow="never">
           <el-carousel-item v-for="item in 4" :key="item">
             <img
@@ -29,7 +29,7 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-col :offset="2">
+      <el-col :span="20" :offset="3" style="margin-top:80px;">
         <el-collapse  >
           <el-collapse-item title="查看详情" name="1">
             <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>

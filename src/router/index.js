@@ -9,7 +9,7 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-    { path: '/', redirect: '/index' },
+    { path: '/', redirect: '/foodslist' },
     { path: '/index', component: index },
     { path: '/cart', component: CartList },
     { path: '/orderlist', component: OrderList },

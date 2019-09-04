@@ -1,6 +1,6 @@
 <template>
   <el-footer>
-    <span>copyright:radoapx</span>
+    <span>Copyright © 2019  Radoapx 保留所有权利。</span>
   </el-footer>
 </template>
 

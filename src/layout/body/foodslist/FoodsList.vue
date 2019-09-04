@@ -1,58 +1,11 @@
 <template>
   <el-container>
     <el-aside width="200px">
-      <el-menu :default-openeds="['1', '3']">
-        <el-submenu index="1">
-          <template slot="title">
-            <i class="el-icon-message"></i>导航一
-          </template>
-          <el-menu-item-group>
-            <template slot="title">分组一</template>
-            <el-menu-item index="1-1">选项1</el-menu-item>
-            <el-menu-item index="1-2">选项2</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="分组2">
-            <el-menu-item index="1-3">选项3</el-menu-item>
-          </el-menu-item-group>
-          <el-submenu index="1-4">
-            <template slot="title">选项4</template>
-            <el-menu-item index="1-4-1">选项4-1</el-menu-item>
-          </el-submenu>
-        </el-submenu>
-        <el-submenu index="2">
-          <template slot="title">
-            <i class="el-icon-menu"></i>导航二
-          </template>
-          <el-menu-item-group>
-            <template slot="title">分组一</template>
-            <el-menu-item index="2-1">选项1</el-menu-item>
-            <el-menu-item index="2-2">选项2</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="分组2">
-            <el-menu-item index="2-3">选项3</el-menu-item>
-          </el-menu-item-group>
-          <el-submenu index="2-4">
-            <template slot="title">选项4</template>
-            <el-menu-item index="2-4-1">选项4-1</el-menu-item>
-          </el-submenu>
-        </el-submenu>
-        <el-submenu index="3">
-          <template slot="title">
-            <i class="el-icon-setting"></i>导航三
-          </template>
-          <el-menu-item-group>
-            <template slot="title">分组一</template>
-            <el-menu-item index="3-1">选项1</el-menu-item>
-            <el-menu-item index="3-2">选项2</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="分组2">
-            <el-menu-item index="3-3">选项3</el-menu-item>
-          </el-menu-item-group>
-          <el-submenu index="3-4">
-            <template slot="title">选项4</template>
-            <el-menu-item index="3-4-1">选项4-1</el-menu-item>
-          </el-submenu>
-        </el-submenu>
+      <el-menu>
+        <el-menu-item index="-1">
+          <i class="el-icon-s-fold"></i>浏览所有
+        </el-menu-item>
+        <el-menu-item v-for="(item,i) in goodsCategorys" :key="item.pk" :index="i.toString()">{{item.fields.name}}</el-menu-item>
       </el-menu>
     </el-aside>
     <el-main>
@@ -89,30 +42,33 @@ export default {
       };
       this.goodsList.push(good);
     }
+    this.$http.get("api/get_all_food_category").then(result => {
+      if (result.body.error_num == 0) {
+        this.goodsCategorys = result.body.list;
+      } else {
+        this.$message({
+          type: "error",
+          message: "获取分类列表不成功，请重试"
+        });
+      }
+    });
   },
   data() {
-    const item = {
-      date: "2016-05-02",
-      name: "王小虎",
-      address: "上海市普陀区金沙江路 1518 弄"
-    };
-    const goods = {
-      img:
-        "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-      name: "汉堡",
-      category: "快餐",
-      price: "100"
-    };
     return {
-      tableData: Array(20).fill(item),
       goodsList: [],
-      currentDate: new Date()
+      currentDate: new Date(),
+      goodsCategorys: []
     };
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.el-container {
+  margin-top: 20px;
+  width: 80%;
+  margin-left: 10%;
+}
 .el-aside {
   color: #333;
   background-color: #ffffff;
@@ -148,8 +104,8 @@ export default {
   display: flex;
 
   .el-card {
-    border: 0.1px solid #ccc;
-    box-shadow: 0 0 8px #ccc;
+    // border: 0.1px solid #ccc;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     border-radius: 4%;
     margin: 5px;
     width: 220px;
@@ -176,8 +132,6 @@ export default {
       justify-content: space-between;
       .s-category {
         font-size: 12px;
-      }
-      .el-button {
       }
     }
   }

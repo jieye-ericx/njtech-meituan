@@ -1,10 +1,10 @@
 <template>
   <div>
-    <el-container direction="vertical">
+    <div>
       <MainHeader></MainHeader>
       
       <Footer></Footer>
-    </el-container>
+    </div>
   </div>
 </template>
 

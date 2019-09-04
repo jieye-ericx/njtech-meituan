@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-header>
+    <el-header height="44px">
       <el-menu
         :default-active="activeIndex2"
         class="el-menu-demo"
@@ -8,8 +8,14 @@
         @select="handleSelect"
         background-color="#323232"
         text-color="#fff"
-        active-text-color="#ffd04b"
+        active-text-color="#fff"
+        style="height:44px;padding-left:140px;"
       >
+        <el-menu-item index="4">
+          <router-link to="/foodslist" tag="div">
+            <i class="el-icon-platform-eleme"></i>
+          </router-link>
+        </el-menu-item>
         <el-menu-item index="1">
           <router-link tag="div" to="/foodslist">
             <span>美食团购</span>
@@ -30,11 +36,50 @@
             <span>我的订单</span>
           </router-link>
         </el-menu-item>
-        <span class="login-regiest">登陆</span>
-        <span class="login-regiest">|</span>
-        <span class="login-regiest">注册</span>
+        <span class="login-register">登陆</span>
+        <span class="login-register">|</span>
+        <span class="login-register" @click="dialog = true">注册</span>
       </el-menu>
     </el-header>
+
+    <el-drawer
+      title="欢迎注册工大美团"
+      :before-close="handleClose"
+      :visible.sync="dialog"
+      direction="rtl"
+      custom-class="register-drawer"
+      ref="drawer"
+    >
+      <div class="drawer__content">
+        <el-form :model="form">
+          <el-form-item label="昵称" :label-width="formLabelWidth">
+            <el-input v-model="form.nickName" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" :label-width="formLabelWidth">
+            <el-input v-model="form.password" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="性别" :label-width="formLabelWidth">
+            <el-radio v-model="form.sex" label="0">男</el-radio>
+            <el-radio v-model="form.sex" label="1">女</el-radio>
+          </el-form-item>
+          <el-form-item label="手机号" :label-width="formLabelWidth">
+            <el-input v-model="form.mobilePhone" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="身份证号" :label-width="formLabelWidth">
+            <el-input v-model="form.passport" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div class="drawer__footer">
+          <el-button @click="dialog = false">取 消</el-button>
+          <el-button
+            type="primary"
+            @click="$refs.drawer.closeDrawer()"
+            :loading="loading"
+          >{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+        </div>
+      </div>
+    </el-drawer>
+
     <transition>
       <router-view></router-view>
     </transition>
@@ -42,37 +87,102 @@
 </template>
 
 <script>
+import { log } from "util";
 export default {
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
+    },
+    register() {},
+    handleClose(done) {
+      this.$confirm("确定要提交表单吗？")
+        .then(_ => {
+          this.loading = true;
+          this.$http
+            .get(
+              "api/register_account?mobile_phone=" +
+                this.form.mobilePhone +
+                "&sex=" +
+                this.form.sex +
+                "&nickname=" +
+                this.form.nickName +
+                "&passport=" +
+                this.form.passport +
+                "&password=" +
+                this.form.password +
+                "&avatar=" +
+                this.form.avatar
+            )
+            .then(result => {
+              // console.log(result);
+              if (result.body.error_num == 0) {
+                this.loading = false;
+                this.$message({
+                  type: "info",
+                  message: "注册成功，请登录"
+                });
+              } else {
+                this.loading = false;
+                this.$message({
+                  type: "info",
+                  message: "注册不成功，请重试"
+                });
+              }
+            });
+        })
+        .catch(_ => {
+          this.dialog = false;
+          this.$message({
+            type: "info",
+            message: "已取消注册"
+          });
+        });
     }
   },
   data() {
     return {
       activeIndex: "1",
-      activeIndex2: "1"
+      activeIndex2: "1",
+      loading: false,
+      dialog: false,
+      form: {
+        avatar: "1",
+        nickName: "",
+        sex: "",
+        mobilePhone: "",
+        passport: "",
+        password: ""
+      },
+      formLabelWidth: "70px"
     };
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.drawer__footer {
+  display: flex;
+  justify-content: center;
+}
 .el-header {
-  height: 60px;
   padding: 0 0px;
   background-color: #323232;
   color: #333;
-  line-height: 60px;
+  line-height: 44px;
   margin: -1px;
-  span{
-    font-size: 18px;
+  .el-menu-item {
+    height: 44px;
+    text-align: center;
+    line-height: 44px;
   }
-  .login-regiest {
+  span {
+    font-size: 14px;
+  }
+  .login-register {
     color: #f3f3f3;
     float: right;
     margin-right: 10px;
-    line-height: 60px;
+    line-height: 44px;
   }
 }
 .v-enter {
