@@ -28,7 +28,7 @@
           </div>
         </el-card>
       </router-link>
-      <el-pagination layout="prev, pager, next" page-size="20"></el-pagination>
+      <el-pagination layout="prev, pager, next" :page-size="20" :total="50"></el-pagination>
     </el-main>
   </el-container>
 </template>

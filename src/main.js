@@ -10,7 +10,7 @@ Vue.config.productionTip = false
 
 import VueResource from 'vue-resource'
 Vue.use(VueResource)
-Vue.http.options.root = 'http://10.22.252.59:8080'
+Vue.http.options.root = 'http://10.32.23.219:8080'
 
 import moment from 'moment'
 Vue.filter('dateFormat', function (dataStr, pattern = "YYYY-MM-DD HH:mm:ss") {
