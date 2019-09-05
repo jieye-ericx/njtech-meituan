@@ -9,12 +9,12 @@
     </el-row>
     <el-row>
       <el-col :span="8" :offset="3" style="text-align:left">
-        <h1 style="text-align:left;margin-bottom:0;">{{goodInfo.title}}</h1>
-        <h2 style="margin-top:5px;">RMB {{goodInfo.price}}</h2>
-        <el-tag type="info">{{goodInfo.tag}}</el-tag>
+        <h1 style="text-align:left;margin-bottom:0;">{{foodInfo.name}}</h1>
+        <h2 style="margin-top:5px;">RMB {{foodInfo.amount_money}}</h2>
+        <el-tag type="info">{{foodInfo.category_id}}</el-tag>
         <div style="margin-top:25px;display:flex;justify-content:space-between;">
-          <el-input-number size="mini" v-model="num"></el-input-number>
-          <el-button type="primary" plain size="small" style="height:80%;">加入购物袋</el-button>
+          <el-input-number size="mini" v-model="num" :min="1"></el-input-number>
+          <el-button type="primary" plain size="small" style="height:80%;" @click="addToCart">加入购物袋</el-button>
         </div>
       </el-col>
       <el-col :span="12" :push="3">
@@ -30,16 +30,14 @@
     </el-row>
     <el-row>
       <el-col :span="20" :offset="3" style="margin-top:80px;">
-        <el-collapse  >
+        <el-collapse>
           <el-collapse-item title="查看详情" name="1">
-            <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-            <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+            <div>{{foodInfo.introduction}}</div>
+
           </el-collapse-item>
           <el-collapse-item title="评论" name="2">
-            <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
-            <div>页面反馈：操作后，通过页面元素的变化清晰地展现当前状态。</div>
+
           </el-collapse-item>
-          
         </el-collapse>
       </el-col>
     </el-row>
@@ -48,23 +46,53 @@
 
 <script>
 export default {
+  created() {
+    this.$http.get("api/get_food_info?id=" + this.$route.params.id).then(result => {
+              console.log(result.body);
+
+      if (result.body.error_num == 0) {
+        console.log(result.body);
+        
+        this.foodInfo = result.body.list[0].fields;
+      } else {
+        this.$message({
+          type: "error",
+          message: "出错"
+        });
+      }
+    });
+  },
   data() {
     return {
-      id: this.$route.params.id,
-      goodInfo: {
-        title: "汉堡汉堡汉堡汉堡汉堡汉堡汉堡汉堡汉堡汉堡汉堡汉堡",
-        price: "661",
-        tag: "快餐",
-        detail:
-          "有了这款无线充电盒，只需将 AirPods 放入盒中，然后将充电盒放在兼容 Qi 标准的充电器上，即可轻松充电，易如反掌。充电盒正面的 LED 指示灯能显示 AirPods 的充电状态。如果无线充电器没在身边，你也可以通过闪电端口充电。这款无线充电盒适用于各代 AirPods，并能存储额外电量为耳机充电多次。"
-      },
+      foodInfo: {},
       num: 1
     };
   },
   methods: {
     goBack() {
       console.log("go back");
-      this.$router.go(-1)
+      this.$router.go(-1);
+    },
+    addToCart() {
+      var user =
+        this.$store.getters.getUserInfo != null
+          ? this.$store.getters.getUserInfo
+          : null;
+      if (null == user) {
+        console.log("未登录需要登陆");
+        return;
+      }
+      // console.log(user);
+
+      var cartRecord = {
+        uid: user.uid,
+        id: this.$route.params.id,
+        isSelected: true,
+        quantity: this.num,
+        price: this.foodInfo.amount_money,
+        time: new Date()
+      };
+      this.$store.commit("addToCart", cartRecord);
     }
   }
 };

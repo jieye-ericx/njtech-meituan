@@ -5,25 +5,30 @@
         <el-menu-item index="-1">
           <i class="el-icon-s-fold"></i>浏览所有
         </el-menu-item>
-        <el-menu-item v-for="(item,i) in goodsCategorys" :key="item.pk" :index="i.toString()">{{item.fields.name}}</el-menu-item>
+        <el-menu-item
+          v-for="(item,i) in goodsCategorys"
+          :key="item.pk"
+          :index="i.toString()"
+        >{{item.fields.name}}</el-menu-item>
       </el-menu>
     </el-aside>
     <el-main>
-      <router-link :to="'/foodinfo/'+good.id" tag="div" v-for="(good) in goodsList" :key="good.id">
+      <router-link :to="'/foodinfo/'+good.id" tag="div" v-for="(good) in foodsList" :key="good.id">
         <el-card :body-style="{ padding: '1px' }">
-          <img :src="good.img" class="image" />
+          <img :src="good.picUrl1" class="image" />
           <div>
             <div class="name-price">
-              <span class="s-name">{{good.name}}+{{good.id}}</span>
-              <span class="s-price">¥{{good.price}}</span>
+              <span class="s-name">{{good.name}}</span>
+              <span class="s-price">¥{{good.amount_money}}</span>
             </div>
             <div class="category-more">
-              <span class="s-category">{{good.category}}</span>
+              <span class="s-category">{{good.category_id}}</span>
               <el-button type="text" class="button">了解更多</el-button>
             </div>
           </div>
         </el-card>
       </router-link>
+      <el-pagination layout="prev, pager, next" page-size="20"></el-pagination>
     </el-main>
   </el-container>
 </template>
@@ -31,17 +36,17 @@
 <script>
 export default {
   created() {
-    for (var i = 0; i < 100; i++) {
-      var good = {
-        img:
-          "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-        name: "汉堡",
-        category: "快餐",
-        price: "100",
-        id: i
-      };
-      this.goodsList.push(good);
-    }
+    // for (var i = 0; i < 100; i++) {
+    //   var good = {
+    //     img:
+    //       "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
+    //     name: "汉堡",
+    //     category: "快餐",
+    //     price: "100",
+    //     id: i
+    //   };
+    //   this.foodsList.push(good);
+    // }
     this.$http.get("api/get_all_food_category").then(result => {
       if (result.body.error_num == 0) {
         this.goodsCategorys = result.body.list;
@@ -52,13 +57,29 @@ export default {
         });
       }
     });
+
+    this.getAllFoods();
+    console.log(this.foodsList);
   },
   data() {
     return {
-      goodsList: [],
+      foodsList: [],
       currentDate: new Date(),
-      goodsCategorys: []
+      goodsCategorys: [],
+      page: 1
     };
+  },
+  methods: {
+    getAllFoods() {
+      this.$http.get("api/get_page_food?page=" + this.page).then(result => {
+        this.foodsList = [];
+        result.body.list.forEach(element => {
+          var obj = element.fields;
+          obj.id = element.pk;
+          this.foodsList.push(obj);
+        });
+      });
+    }
   }
 };
 </script>

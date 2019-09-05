@@ -104,7 +104,7 @@ export default {
     getSummaries(param) {
       const { columns, data } = param;
       const sums = [];
-      console.log(data);
+      // console.log(data);
       sums[0]='总计'
       sums[5]='';
       var sum=0
