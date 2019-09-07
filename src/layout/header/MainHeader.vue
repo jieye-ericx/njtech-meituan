@@ -37,7 +37,7 @@
           </router-link>
         </el-menu-item>
         <div v-if="!this.$store.getters.isLogin">
-          <span class="login-register" @click="dialog1 = true">登陆</span>
+          <span class="login-register" @click="dialog1 = true">登录</span>
           <span class="login-register">|</span>
           <span class="login-register" @click="dialog = true">注册</span>
         </div>
@@ -121,6 +121,8 @@
 
 <script>
 import { log } from "util";
+import Cookies from "js-cookie";
+
 export default {
   methods: {
     handleSelect(key, keyPath) {
@@ -171,8 +173,7 @@ export default {
         });
     },
     quit() {
-      this.$store.dispatch("userLogin", false);
-      localStorage.setItem("Flag", "notLogin");
+      this.$store.commit("loginOut");
     },
     pushLogin(done) {
       // this.$confirm("确定要登陆吗？")
@@ -216,13 +217,18 @@ export default {
       //   this.dialog = false;
       //   this.$message({
       //     type: "info",
-      //     message: "已取消注册"
+      //     message: "已取消登录"
       //   });
       // });
       this.dialog1 = false;
-      this.$store.dispatch("userLogin", true);
-      localStorage.setItem("Flag", "isLogin");
       this.loading1 = false;
+      var user = {
+        uid: 1,
+        nickName: "para",
+        sex: "男",
+        phone: "19850052217"
+      };
+      this.$store.commit("loginIn", user);
     }
   },
   data() {

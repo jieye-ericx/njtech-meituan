@@ -1,19 +1,18 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import * as Cookies from "js-cookie"
 Vue.use(Vuex)
 
 var store = new Vuex.Store({
   state: {
-    // {id},
-    token: window.sessionStorage.getItem('token'),
+    isManager: false,
     isLogin: false,
-    nowUser: {
-      uid: '11',
-      nickName: '二丫',
-      phone: '19850052217',
-      sex: '男'
-    },
-    cart: []
+    cart: [],
+    loginState: {
+      loginIn: false,
+      user: {
+      }
+    }
   },
   mutations: {
     addToCart (state, obj) {
@@ -55,81 +54,51 @@ var store = new Vuex.Store({
       })
       // localStorage.setItem('cart', JSON.stringify(state.cart))
     },
-    userStatus (state, flag) {
-      state.isLogin = flag
-    },
-    updateCartNum (state, obj) {
-      state.cart.some(item => {
-        if (item.id == obj.id) {
-          item.count = parseInt(obj.count)
-          return true
-        }
-      })
-      localStorage.setItem('cart', JSON.stringify(state.cart))
-    },
-    removeFromCart (state, i) {
-      state.cart.some((item, j) => {
-        if (item.id == i) {
-          state.cart.splice(j, 1)
-          return true
-        }
-      })
-      localStorage.setItem('cart', JSON.stringify(state.cart))
-    },
-    updateGoodSelected (state, info) {
-      state.cart.some(item => {
-        if (item.id == info.id) {
-          item.selected = info.selected
-        }
-      })
-      localStorage.setItem('cart', JSON.stringify(state.cart))
+    // 登入状态
+    loginIn (state, user) {
+      state.loginState.loginIn = true
+            state.loginState.user = user
+            state.isLogin = true
+      Cookies.set('loginState', state.loginState, { expires: 2 })
+        },
+    // 登出状态
+    loginOut (state) {
+      state.loginState.loginIn = false
+            state.loginState.user = {}
+            state.isLogin = false
+
+      Cookies.remove('loginState')
+        },
+    syncLoginState (state) {
+      let cookieState = Cookies.getJSON('loginState')
+            if (cookieState) {
+        state.loginState = cookieState
+                state.isLogin = true
+      }
     }
   },
   getters: {
     isLogin: state => state.isLogin,
-
-    getUserInfo (state) {
-      return state.nowUser != null ? state.nowUser : null
-    },
-    getUserId (state) {
-      return state.nowUser != null ? state.nowUser.uid : null
-    },
-    getAllCountInCart (state) {
-      var n = 0
-      state.cart.forEach(item => {
-        n += item.count
-      })
-      return n
-    },
-    getGoodsCount (state) {
-      var x = {}
-      state.cart.forEach(item => {
-        x[item.id] = item.count
-      })
-      return x
-    },
-    getGoodsSelected (state) {
-      var x = {}
-      state.cart.forEach(item => {
-        x[item.id] = item.selected
-      })
-      return x
-    },
-    getGoodsNumSelected (state) {
-      var o = { num: 0, price: 0 }
-      state.cart.forEach(item => {
-        if (item.selected == true) {
-          o.num += item.count
-          o.price += item.price * item.count
+    offLine: (state, getters, rootState) => {
+      return !state.loginState.loginIn
         }
-      })
-      return o
-    }
   },
   actions: {
-    userLogin ({ commit }, flag) {
-      commit('userStatus', flag)
-    }
+    // 从服务器端校验本地登录 Cookie 有效性
+    authUser ({ state, commit }) {
+      var res = {
+        uid: '11',
+        nickName: '二丫',
+        phone: '19850052217',
+        sex: '男'
+      }
+      commit('loginIn', res)
+            return true
+            // } else {
+            //     commit('loginOut');
+            //     return false;
+            // }
+        }
   }
 })
 
