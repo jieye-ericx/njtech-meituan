@@ -9,12 +9,33 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-    { path: '/', redirect: '/foodslist' },
-    { path: '/index', component: index },
-    { path: '/cart', component: CartList },
-    { path: '/orderlist', component: OrderList },
-    { path: '/foodslist', component: FoodsList },
-    { path: '/foodinfo/:id', component: FoodInfo }
+    {
+      path: '/', redirect: '/foodslist',
+      meta: {
+        needLogin: false
+      }
+    },
+    {
+      path: '/index', component: index, meta: {
+        needLogin: false
+      }
+    },
+    {
+      path: '/cart', component: CartList, meta: {
+        needLogin: true
+      }
+    },
+    { path: '/orderlist', component: OrderList, meta: { needLogin: true } },
+    {
+      path: '/foodslist', component: FoodsList, meta: {
+        needLogin: false
+      }
+    },
+    {
+      path: '/foodinfo/:id', component: FoodInfo, meta: {
+        needLogin: false
+      }
+    }
 
   ]
 })

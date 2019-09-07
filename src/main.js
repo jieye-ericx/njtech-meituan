@@ -3,6 +3,44 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+
+router.beforeEach((to, from, next) => {
+
+  // 获取用户登录成功后储存的登录标志
+  let getFlag = localStorage.getItem("Flag");
+
+  //如果登录标志存在且为isLogin，即用户已登录
+  if (getFlag === "isLogin") {
+    //设置vuex登录状态为已登录
+    store.state.isLogin = true
+    next()
+    //如果已登录，还想想进入登录注册界面，则定向回首页
+    //如果登录标志不存在，即未登录
+  }else{
+    if (to.meta.needLogin) {
+      const vueObj = new Vue()
+      vueObj.$message({
+        type: 'error',
+        message: '请先登录'
+      })
+      next({
+        path: '/foodslist',
+      }) 
+    } else {
+      next()
+    }
+  }
+  // else {
+  //   const vueObj = new Vue()
+  //   vueObj.$message({
+  //     type: "info",
+  //     message: "请先登录"
+  //   });
+  //用户想进入需要登录的页面，则定向回登录界面
+  
+})
+
+
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
@@ -13,7 +51,7 @@ Vue.use(VueResource)
 Vue.http.options.root = 'http://10.32.23.219:8080'
 
 import moment from 'moment'
-Vue.filter('dateFormat', function (dataStr, pattern = "YYYY-MM-DD HH:mm:ss") {
+Vue.filter('dateFormat', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
   return moment(dataStr).format(pattern)
 })
 import store from './vuex/index.js'

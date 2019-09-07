@@ -11,7 +11,7 @@
         active-text-color="rgb(181,181,181)"
         style="height:44px;margin-left:20%;"
       >
-        <el-menu-item index="0" >
+        <el-menu-item index="0">
           <router-link to="/foodslist" tag="div">
             <i class="el-icon-platform-eleme" style="color:#fff;"></i>
           </router-link>
@@ -36,15 +36,20 @@
             <span>我的订单</span>
           </router-link>
         </el-menu-item>
-        <span class="login-register">登陆</span>
-        <span class="login-register">|</span>
-        <span class="login-register" @click="dialog = true">注册</span>
+        <div v-if="!this.$store.getters.isLogin">
+          <span class="login-register" @click="dialog1 = true">登陆</span>
+          <span class="login-register">|</span>
+          <span class="login-register" @click="dialog = true">注册</span>
+        </div>
+        <div v-if="this.$store.getters.isLogin">
+          <span class="login-register" @click="quit">退出</span>
+        </div>
       </el-menu>
     </el-header>
 
     <el-drawer
       title="欢迎注册工大美团"
-      :before-close="handleClose"
+      :before-close="pushRegeistr"
       :visible.sync="dialog"
       direction="rtl"
       custom-class="register-drawer"
@@ -80,6 +85,34 @@
       </div>
     </el-drawer>
 
+    <el-drawer
+      title="欢迎登录工大美团"
+      :before-close="pushLogin"
+      :visible.sync="dialog1"
+      direction="rtl"
+      custom-class="register-drawer"
+      ref="drawer"
+    >
+      <div class="drawer__content">
+        <el-form :model="form">
+          <el-form-item label="手机号" :label-width="formLabelWidth">
+            <el-input v-model="form.nickName" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" :label-width="formLabelWidth">
+            <el-input v-model="form.password" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div class="drawer__footer">
+          <el-button @click="dialog1 = false">取 消</el-button>
+          <el-button
+            type="primary"
+            @click="$refs.drawer.closeDrawer()"
+            :loading="loading1"
+          >{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+        </div>
+      </div>
+    </el-drawer>
+
     <transition>
       <router-view></router-view>
     </transition>
@@ -93,8 +126,7 @@ export default {
     handleSelect(key, keyPath) {
       // console.log(key, keyPath);
     },
-    register() {},
-    handleClose(done) {
+    pushRegeistr(done) {
       this.$confirm("确定要提交表单吗？")
         .then(_ => {
           this.loading = true;
@@ -137,6 +169,60 @@ export default {
             message: "已取消注册"
           });
         });
+    },
+    quit() {
+      this.$store.dispatch("userLogin", false);
+      localStorage.setItem("Flag", "notLogin");
+    },
+    pushLogin(done) {
+      // this.$confirm("确定要登陆吗？")
+      // .then(_ => {
+      //   this.loading1 = true;
+      //   this.$http
+      //     .get(
+      //       "api/register_account?mobile_phone=" +
+      //         this.form.mobilePhone +
+      //         "&sex=" +
+      //         this.form.sex +
+      //         "&nickname=" +
+      //         this.form.nickName +
+      //         "&passport=" +
+      //         this.form.passport +
+      //         "&password=" +
+      //         this.form.password +
+      //         "&avatar=" +
+      //         this.form.avatar
+      //     )
+      //     .then(result => {
+      //       // console.log(result);
+      //       if (result.body.error_num == 0) {
+      //         this.$store.dispatch("userLogin", true);
+      //         localStorage.setItem("Flag", "isLogin");
+      //         this.loading = false;
+      //         this.$message({
+      //           type: "info",
+      //           message: "登陆成功"
+      //         });
+      //       } else {
+      //         this.loading = false;
+      //         this.$message({
+      //           type: "error",
+      //           message: "登陆失败"
+      //         });
+      //       }
+      //     });
+      // })
+      // .catch(_ => {
+      //   this.dialog = false;
+      //   this.$message({
+      //     type: "info",
+      //     message: "已取消注册"
+      //   });
+      // });
+      this.dialog1 = false;
+      this.$store.dispatch("userLogin", true);
+      localStorage.setItem("Flag", "isLogin");
+      this.loading1 = false;
     }
   },
   data() {
@@ -144,7 +230,9 @@ export default {
       activeIndex: "1",
       activeIndex2: "1",
       loading: false,
+      loading1: false,
       dialog: false,
+      dialog1: false,
       form: {
         avatar: "1",
         nickName: "",
