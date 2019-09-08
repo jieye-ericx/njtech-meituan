@@ -10,7 +10,15 @@
           <el-table-column prop="total" label="金额 RMB" width="110"></el-table-column>
           <el-table-column width="180">
             <template slot-scope="scope">
-              <el-button size="mini" @click="sendComplaint(scope.$index, scope.row)">投诉</el-button>
+              <div v-if="isLogin&&!isManager">
+                <el-button size="mini" @click="sendComplaint(scope.$index, scope.row)">投诉</el-button>
+              </div>
+              <div v-if="isManager">
+                <el-button
+                  size="mini"
+                  @click="deleteOrder(scope.$index, scope.row)"
+                >删除</el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -34,6 +42,10 @@
 <script>
 export default {
   props: {},
+  created(){
+    console.log(this.$store.getters.isLogin);
+    
+  },
   data() {
     return {
       tableData: [
@@ -47,19 +59,26 @@ export default {
         }
       ],
       dialogFormVisible: false,
-      formLabelWidth: '120px',
+      formLabelWidth: "120px",
       form: {
         content: "",
-        uid:this.$store.getters.getUserId,
-        purchase_order_id:''
+        purchase_order_id: ""
       }
     };
+  },
+  computed:{
+    isLogin: function () {
+      return this.$store.getters.isLogin
+    },
+    isManager:function () {
+      return this.$store.getters.isManager
+    }
   },
   methods: {
     sendComplaint(index, row) {
       this.dialogFormVisible = true;
       // console.log(index, row);
-      this.form.purchase_order_id=row.id
+      this.form.purchase_order_id = row.id;
     },
     clickOk() {
       this.dialogFormVisible = false;
@@ -68,23 +87,30 @@ export default {
           "api/add_complaints?purchase_order_id=" +
             this.form.purchase_order_id +
             "&customer_id=" +
-             this.form.uid+
+            this.form.uid +
             "&content=" +
             this.form.content
         )
         .then(result => {
           if (result.body.error_num == 0) {
             this.$message({
+              duration: 1000,
+
               type: "info",
               message: "添加成功"
             });
           } else {
             this.$message({
+              duration: 1000,
+
               type: "error",
               message: "出错"
             });
           }
         });
+    },
+    deleteOrder(){
+
     }
   }
 };

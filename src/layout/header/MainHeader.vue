@@ -22,26 +22,33 @@
           </router-link>
         </el-menu-item>
         <el-menu-item index="2">
-          <router-link to="/" tag="div">
-            <span>未命名</span>
-          </router-link>
+          <div v-if="this.$store.getters.isLogin&&this.$store.getters.isManager">
+            <router-link to="/allusers" tag="div">
+              <span>所有用户</span>
+            </router-link>
+          </div>
+          <div v-else>
+            <router-link to="/cart" tag="div">
+              <span>购物车</span>
+            </router-link>
+          </div>
         </el-menu-item>
         <el-menu-item index="3">
-          <router-link to="/cart" tag="div">
-            <span>购物车</span>
-          </router-link>
-        </el-menu-item>
-        <el-menu-item index="4">
           <router-link to="/orderlist" tag="div">
             <span>我的订单</span>
           </router-link>
         </el-menu-item>
-        <div v-if="!this.$store.getters.isLogin">
+        <el-menu-item index="4">
+          <div v-if="this.$store.getters.isLogin&&this.$store.getters.isManager">
+            <span @click="AddFoodDialog=true">添加团购</span>
+          </div>
+        </el-menu-item>
+        <div v-if="!this.$store.getters.isLogin&&!this.$store.getters.isManager">
           <span class="login-register" @click="dialog1 = true">登录</span>
           <span class="login-register">|</span>
           <span class="login-register" @click="dialog = true">注册</span>
         </div>
-        <div v-if="this.$store.getters.isLogin">
+        <div v-if="this.$store.getters.isLogin||this.$store.getters.isManager">
           <span class="login-register" @click="quit">退出</span>
         </div>
       </el-menu>
@@ -56,22 +63,22 @@
       ref="drawer"
     >
       <div class="drawer__content">
-        <el-form :model="form">
+        <el-form :model="registerForm">
           <el-form-item label="昵称" :label-width="formLabelWidth">
-            <el-input v-model="form.nickName" autocomplete="off"></el-input>
+            <el-input v-model="registerForm.nickName" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth">
-            <el-input v-model="form.password" autocomplete="off"></el-input>
+            <el-input v-model="registerForm.password" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="性别" :label-width="formLabelWidth">
-            <el-radio v-model="form.sex" label="0">男</el-radio>
-            <el-radio v-model="form.sex" label="1">女</el-radio>
+            <el-radio v-model="registerForm.sex" label="0">男</el-radio>
+            <el-radio v-model="registerForm.sex" label="1">女</el-radio>
           </el-form-item>
           <el-form-item label="手机号" :label-width="formLabelWidth">
-            <el-input v-model="form.mobilePhone" autocomplete="off"></el-input>
+            <el-input v-model="registerForm.mobilePhone" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="身份证号" :label-width="formLabelWidth">
-            <el-input v-model="form.passport" autocomplete="off"></el-input>
+            <el-input v-model="registerForm.passport" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
         <div class="drawer__footer">
@@ -94,12 +101,12 @@
       ref="drawer"
     >
       <div class="drawer__content">
-        <el-form :model="form">
+        <el-form :model="loginForm">
           <el-form-item label="手机号" :label-width="formLabelWidth">
-            <el-input v-model="form.nickName" autocomplete="off"></el-input>
+            <el-input v-model="loginForm.nickName" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth">
-            <el-input v-model="form.password" autocomplete="off"></el-input>
+            <el-input v-model="loginForm.password" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
         <div class="drawer__footer">
@@ -113,6 +120,50 @@
       </div>
     </el-drawer>
 
+    <el-drawer
+      title="添加团购"
+      :before-close="pushNewFood"
+      :visible.sync="AddFoodDialog"
+      direction="ttb"
+      custom-class="register-drawer"
+      ref="drawer"
+      size="80%"
+    >
+      <div class="drawer__content">
+        <el-form :model="newFood">
+          <el-form-item>
+            <el-upload
+              action="https://jsonplaceholder.typicode.com/posts/"
+              list-type="picture-card"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove"
+              multiple="true"
+            >
+              <i class="el-icon-plus"></i>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+              <img width="100%" :src="dialogImageUrl" alt />
+            </el-dialog>
+          </el-form-item>
+          <el-form-item label="团购名称" :label-width="formLabelWidth">
+            <el-input v-model="newFood.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="简介" :label-width="formLabelWidth">
+            <el-input v-model="newFood.details" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="价格" :label-width="formLabelWidth">
+            <el-input v-model="newFood.price" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="类别" :label-width="formLabelWidth">
+            <el-tag v-for="item in goodsCategorys" :key="item.pk" type="info" :effect="seleteCategoryId==item.pk?dark:plain" @click="seleteCategoryId=item.pk">{{item.fields.name}}</el-tag>
+          </el-form-item>
+        </el-form>
+        <div class="drawer__footer">
+          <el-button @click="AddFoodDialog = false">取 消</el-button>
+          <el-button type="primary" @click="$refs.drawer.closeDrawer()">提交</el-button>
+        </div>
+      </div>
+    </el-drawer>
     <transition>
       <router-view></router-view>
     </transition>
@@ -152,12 +203,16 @@ export default {
               if (result.body.error_num == 0) {
                 this.loading = false;
                 this.$message({
+                  duration: 1000,
+
                   type: "info",
                   message: "注册成功，请登录"
                 });
               } else {
                 this.loading = false;
                 this.$message({
+                  duration: 1000,
+
                   type: "info",
                   message: "注册不成功，请重试"
                 });
@@ -167,6 +222,8 @@ export default {
         .catch(_ => {
           this.dialog = false;
           this.$message({
+            duration: 1000,
+
             type: "info",
             message: "已取消注册"
           });
@@ -229,17 +286,41 @@ export default {
         phone: "19850052217"
       };
       this.$store.commit("loginIn", user);
+    },
+    pushNewFood() {},
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    getCategorys() {
+      this.$http.get("api/get_all_food_category").then(result => {
+        if (result.body.error_num == 0) {
+          this.goodsCategorys = result.body.list;
+        } else {
+          this.$message({
+            duration: 1000,
+            type: "error",
+            message: "获取分类列表不成功，请重试"
+          });
+        }
+      });
     }
   },
   data() {
     return {
+      seleteCategoryId:'',
+      goodsCategorys: [],
       activeIndex: "1",
       activeIndex2: "1",
       loading: false,
       loading1: false,
       dialog: false,
       dialog1: false,
-      form: {
+      AddFoodDialog: false,
+      registerForm: {
         avatar: "1",
         nickName: "",
         sex: "",
@@ -247,7 +328,18 @@ export default {
         passport: "",
         password: ""
       },
-      formLabelWidth: "70px"
+      loginForm: {
+        nickName: "",
+        password: ""
+      },
+      newFood: {
+        name: "",
+        details: "",
+        price: ""
+      },
+      formLabelWidth: "70px",
+      dialogImageUrl: "",
+      dialogVisible: false
     };
   }
 };

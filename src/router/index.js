@@ -5,6 +5,8 @@ import CartList from '@/layout/body/Cart.vue'
 import OrderList from '@/layout/body/OrderList.vue'
 import FoodsList from '@/layout/body/foodslist/FoodsList.vue'
 import FoodInfo from '@/layout/body/foodslist/FoodInfo.vue'
+import ManagerLogin from '@/layout/body/ManagerLogin.vue'
+import Allusers from '@/layout/body/Allusers.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -34,6 +36,16 @@ export default new Router({
     {
       path: '/foodinfo/:id', component: FoodInfo, meta: {
         needLogin: false
+      }
+    },
+    {
+      path: '/manager', component: ManagerLogin, meta: {
+        needLogin: false
+      }
+    },
+    {
+      path: '/allusers', component: Allusers, meta: {
+        needLogin: true
       }
     }
 

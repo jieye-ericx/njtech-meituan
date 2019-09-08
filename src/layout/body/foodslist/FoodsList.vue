@@ -52,6 +52,7 @@ export default {
         this.goodsCategorys = result.body.list;
       } else {
         this.$message({
+          duration: 1000,
           type: "error",
           message: "获取分类列表不成功，请重试"
         });

@@ -17,6 +17,8 @@ router.beforeEach((to, from, next) => {
     if (to.meta.needLogin) {
       const vueObj = new Vue()
       vueObj.$message({
+        duration:1000,
+
         type: 'error',
         message: '请先登录'
       })

@@ -56,6 +56,7 @@ export default {
         this.foodInfo = result.body.list[0].fields;
       } else {
         this.$message({
+          duration:1000,
           type: "error",
           message: "出错"
         });
