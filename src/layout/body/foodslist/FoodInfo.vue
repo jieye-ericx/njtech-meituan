@@ -21,7 +21,7 @@
         <el-carousel :interval="4000" type="card" height="200px" arrow="never">
           <el-carousel-item v-for="item in 4" :key="item">
             <img
-              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+              :src="foodInfo.url1"
               alt
             />
           </el-carousel-item>
@@ -47,11 +47,9 @@ export default {
     this.$http
       .get("api/get_food_info?id=" + this.$route.params.id)
       .then(result => {
-        // console.log(result.body);
-
-        if (result.body.error_num == 0) {
+        // console.log(result.body)
+        if (result.body.error_num === 0) {
           // console.log(result.body);
-
           this.foodInfo = result.body.list[0].fields;
         } else {
           this.$message({

@@ -38,18 +38,16 @@ var store = new Vuex.Store({
         '&amount_money=' +
         newObj.price
       ).then(result => {
-        console.log('3231' + result)
+        console.log('添加购物车时发送的请求' + result)
         if (result.body.error_num == 0) {
           vueObj.$message({
             duration: 1000,
-
             type: 'info',
             message: '添加成功'
           })
         } else {
           vueObj.$message({
             duration: 1000,
-
             type: 'error',
             message: '出错'
           })
@@ -73,15 +71,15 @@ var store = new Vuex.Store({
 
       Cookies.remove('loginState')
     },
-    
     syncLoginState(state) {
       let cookieState = Cookies.getJSON('loginState')
       if (cookieState) {
+        console.log(cookieState);
+        
         state.loginState = cookieState
         state.isLogin = true
       }
     },
-    
     managerLogin(state) {
       state.isManager = true
       state.loginState.loginIn = true
@@ -105,21 +103,6 @@ var store = new Vuex.Store({
     }
   },
   actions: {
-    // 从服务器端校验本地登录 Cookie 有效性
-    authUser({ state, commit }) {
-      var res = {
-        uid: '11',
-        nickName: '二丫',
-        phone: '19850052217',
-        sex: '男'
-      }
-      commit('loginIn', res)
-      return true
-      // } else {
-      //     commit('loginOut');
-      //     return false;
-      // }
-    }
   }
 })
 

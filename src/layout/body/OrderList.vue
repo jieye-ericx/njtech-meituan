@@ -44,7 +44,6 @@ export default {
   props: {},
   created(){
     console.log(this.$store.getters.isLogin);
-    
   },
   data() {
     return {
@@ -104,7 +103,7 @@ export default {
     deleteOrder(){
     },
     getOrders(){
-      this.$http.get('api/')
+      // this.$http.get('api/')
     }
   }
 };
