@@ -49,14 +49,6 @@ export default {
   data() {
     return {
       tableData: [
-        {
-          id: "2",
-          date: "2016-05-02 13:22",
-          name: "大保健套餐",
-          num: "2",
-          total: "1000",
-          remark: "要开发票"
-        }
       ],
       dialogFormVisible: false,
       formLabelWidth: "120px",
@@ -110,7 +102,9 @@ export default {
         });
     },
     deleteOrder(){
-
+    },
+    getOrders(){
+      this.$http.get('api/')
     }
   }
 };

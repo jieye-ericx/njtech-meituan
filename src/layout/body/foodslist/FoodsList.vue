@@ -3,12 +3,13 @@
     <el-aside width="200px">
       <el-menu>
         <el-menu-item index="-1">
-          <i class="el-icon-s-fold"></i>浏览所有
+          <i class="el-icon-s-fold" @click="getAllFoods">浏览所有</i>
         </el-menu-item>
         <el-menu-item
-          v-for="(item,i) in goodsCategorys"
+          v-for="(item,i) in AllFoodsCategory"
           :key="item.pk"
           :index="i.toString()"
+          @click="getFoodsByCategory(item.pk)"
         >{{item.fields.name}}</el-menu-item>
       </el-menu>
     </el-aside>
@@ -28,7 +29,7 @@
           </div>
         </el-card>
       </router-link>
-      <el-pagination layout="prev, pager, next" :page-size="20" :total="50"></el-pagination>
+      <el-pagination layout="prev, pager, next" :page-size="20" ></el-pagination>
     </el-main>
   </el-container>
 </template>
@@ -36,43 +37,46 @@
 <script>
 export default {
   created() {
-    // for (var i = 0; i < 100; i++) {
-    //   var good = {
-    //     img:
-    //       "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-    //     name: "汉堡",
-    //     category: "快餐",
-    //     price: "100",
-    //     id: i
-    //   };
-    //   this.foodsList.push(good);
-    // }
-    this.$http.get("api/get_all_food_category").then(result => {
-      if (result.body.error_num == 0) {
-        this.goodsCategorys = result.body.list;
-      } else {
-        this.$message({
-          duration: 1000,
-          type: "error",
-          message: "获取分类列表不成功，请重试"
-        });
-      }
-    });
-
+    this.getAllFoodsCategory();
     this.getAllFoods();
-    console.log(this.foodsList);
   },
   data() {
     return {
       foodsList: [],
-      currentDate: new Date(),
-      goodsCategorys: [],
-      page: 1
+      AllFoodsCategory: [],
+      page: 1,
+      nowCategoryId:0
     };
   },
   methods: {
+    getAllFoodsCategory() {
+      this.$http.get("api/get_all_food_category").then(result => {
+        if (result.body.error_num == 0) {
+          this.AllFoodsCategory = result.body.list;
+        } else {
+          this.$message({
+            duration: 1000,
+            type: "error",
+            message: "获取分类列表不成功，请重试"
+          });
+        }
+      });
+    },
     getAllFoods() {
+      this.nowCategoryId=0
       this.$http.get("api/get_page_food?page=" + this.page).then(result => {
+        this.foodsList = [];
+        result.body.list.forEach(element => {
+          var obj = element.fields;
+          obj.id = element.pk;
+          this.foodsList.push(obj);
+        });
+      });
+    },
+    getFoodsByCategory(id) {
+      this.nowCategoryId=id
+      this.page=1
+      this.$http.get("api/get_page_food_by_category?page=" + this.page+"&category_id="+id).then(result => {
         this.foodsList = [];
         result.body.list.forEach(element => {
           var obj = element.fields;

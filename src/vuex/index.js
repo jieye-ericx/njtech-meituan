@@ -10,8 +10,7 @@ var store = new Vuex.Store({
     cart: [],
     loginState: {
       loginIn: false,
-      user: {
-      }
+      user: null
     }
   },
   mutations: {
@@ -74,6 +73,7 @@ var store = new Vuex.Store({
 
       Cookies.remove('loginState')
     },
+    
     syncLoginState(state) {
       let cookieState = Cookies.getJSON('loginState')
       if (cookieState) {
@@ -81,6 +81,7 @@ var store = new Vuex.Store({
         state.isLogin = true
       }
     },
+    
     managerLogin(state) {
       state.isManager = true
       state.loginState.loginIn = true
@@ -94,6 +95,13 @@ var store = new Vuex.Store({
     isManager: state => state.isManager,
     offLine: (state, getters, rootState) => {
       return !state.loginState.loginIn
+    },
+    userInfo:(state)=>{
+      if(state.loginState.user!=null){
+        return state.loginState.user
+      }else{
+        return -1
+      }
     }
   },
   actions: {

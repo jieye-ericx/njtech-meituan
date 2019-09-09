@@ -33,11 +33,8 @@
         <el-collapse>
           <el-collapse-item title="查看详情" name="1">
             <div>{{foodInfo.introduction}}</div>
-
           </el-collapse-item>
-          <el-collapse-item title="评论" name="2">
-
-          </el-collapse-item>
+          <el-collapse-item title="评论" name="2"></el-collapse-item>
         </el-collapse>
       </el-col>
     </el-row>
@@ -47,21 +44,23 @@
 <script>
 export default {
   created() {
-    this.$http.get("api/get_food_info?id=" + this.$route.params.id).then(result => {
-              console.log(result.body);
+    this.$http
+      .get("api/get_food_info?id=" + this.$route.params.id)
+      .then(result => {
+        // console.log(result.body);
 
-      if (result.body.error_num == 0) {
-        console.log(result.body);
-        
-        this.foodInfo = result.body.list[0].fields;
-      } else {
-        this.$message({
-          duration:1000,
-          type: "error",
-          message: "出错"
-        });
-      }
-    });
+        if (result.body.error_num == 0) {
+          // console.log(result.body);
+
+          this.foodInfo = result.body.list[0].fields;
+        } else {
+          this.$message({
+            duration: 1000,
+            type: "error",
+            message: "出错"
+          });
+        }
+      });
   },
   data() {
     return {
@@ -76,15 +75,15 @@ export default {
     },
     addToCart() {
       var user =
-        this.$store.getters.getUserInfo != null
-          ? this.$store.getters.getUserInfo
-          : null;
-      if (null == user) {
-        console.log("未登录需要登陆");
+        this.$store.getters.userInfo
+      if (-1 == user) {
+        this.$message({
+          type: "error",
+          message: "请先登录"
+        });
         return;
       }
-      // console.log(user);
-
+      // console.log(user)
       var cartRecord = {
         uid: user.uid,
         id: this.$route.params.id,

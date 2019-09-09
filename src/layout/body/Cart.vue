@@ -15,7 +15,7 @@
           <el-table-column label="团购名称" width="180">
             <template slot-scope="scope">
               <i class="el-icon-s-order"></i>
-              <span style="margin-left: 10px">{{ scope.row.name }}</span>
+              <span style="margin-left: 10px">{{ scope.row.food_id }}</span>
             </template>
           </el-table-column>
           <el-table-column label width="100">
@@ -54,7 +54,12 @@
     </el-row>
     <el-row style="margin-top:25px;margin-bottom:10px;">
       <el-col :span="16" :offset="5" style="text-align:right">
-        <el-button type="primary" plain style="width:100px;height:20px;line-height:1px;" @click="pushOrder">结算</el-button>
+        <el-button
+          type="primary"
+          plain
+          style="width:100px;height:20px;line-height:1px;"
+          @click="pushOrder"
+        >结算</el-button>
       </el-col>
     </el-row>
   </div>
@@ -71,37 +76,12 @@ export default {
   data() {
     return {
       tableData: [
-        {
-          date: "2016-05-02",
-          name: "大保健套餐",
-          quantity: "2",
-          price: "100",
-          isselected: true
-        },
-        {
-          date: "2016-05-02",
-          name: "大保健套餐",
-          quantity: "2",
-          price: "200",
-          isselected: true
-        },
-        {
-          date: "2016-05-02",
-          name: "大保健套餐",
-          quantity: "2",
-          price: "300",
-          isselected: false
-        },
-        {
-          date: "2016-05-02",
-          name: "大保健套餐",
-          quantity: "2",
-          price: "400",
-          isselected: false
-        }
       ],
       minNum: 1
     };
+  },
+  created(){
+    this.getData()
   },
   computed: {
     totalPrice: function() {
@@ -148,18 +128,44 @@ export default {
 
       return sums;
     },
-    pushOrder(){
-      var orders=[]
-      this.tableData.forEach(element=>{
-        if(element.isselected==true){
-          orders.push({element,total:element.quantity*element.price})
+    pushOrder() {
+      var orders = [];
+      this.tableData.forEach(element => {
+        if (element.isselected == true) {
+          orders.push({ element, total: element.quantity * element.price });
+          this.$http.get('api/add_purchase_order?food_id='+element.food_id
+          +'&customer_id='+this.$store.getters.userInfo.uid
+          +"&amount_money="+element.quantity * element.price
+          +"&quantity="+element.quantity)
+          .then(result=>{
+            if(result.body.error_num!=0){
+              this.$message({
+                  duration: 1000,
+                  type: "error",
+                  message: "出错"
+                });
+            }else{
+              console.log(1); 
+            }
+          })
         }
-      })
-      console.log(orders);
-      
+      });
+      // console.log(orders);
     },
-    getCartInfo(){
-      
+    getData() {
+      this.$http
+        .get(
+          "api/get_shopping_cart_content?id=" + this.$store.getters.userInfo.uid
+        )
+        .then(result => {
+          if (result.body.error_num === 0) {
+            result.body.list.forEach(element => {
+              var obj = element.fields;
+              obj.id = element.pk;
+              this.tableData.push(obj);
+            });
+          }
+        });
     }
   }
 };

@@ -34,9 +34,16 @@
           </div>
         </el-menu-item>
         <el-menu-item index="3">
-          <router-link to="/orderlist" tag="div">
-            <span>我的订单</span>
-          </router-link>
+          <div v-if="this.$store.getters.isLogin&&this.$store.getters.isManager">
+            <router-link to="/allorders" tag="div">
+              <span>所有订单</span>
+            </router-link>
+          </div>
+          <div v-else>
+            <router-link to="/orderlist" tag="div">
+              <span>我的订单</span>
+            </router-link>
+          </div>
         </el-menu-item>
         <el-menu-item index="4">
           <div v-if="this.$store.getters.isLogin&&this.$store.getters.isManager">
@@ -103,7 +110,7 @@
       <div class="drawer__content">
         <el-form :model="loginForm">
           <el-form-item label="手机号" :label-width="formLabelWidth">
-            <el-input v-model="loginForm.nickName" autocomplete="off"></el-input>
+            <el-input v-model="loginForm.phone" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth">
             <el-input v-model="loginForm.password" autocomplete="off"></el-input>
@@ -111,11 +118,7 @@
         </el-form>
         <div class="drawer__footer">
           <el-button @click="dialog1 = false">取 消</el-button>
-          <el-button
-            type="primary"
-            @click="$refs.drawer.closeDrawer()"
-            :loading="loading1"
-          >{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+          <el-button type="primary" @click="pushLogin">确定</el-button>
         </div>
       </div>
     </el-drawer>
@@ -137,7 +140,6 @@
               list-type="picture-card"
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
-              multiple="true"
             >
               <i class="el-icon-plus"></i>
             </el-upload>
@@ -155,7 +157,13 @@
             <el-input v-model="newFood.price" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="类别" :label-width="formLabelWidth">
-            <el-tag v-for="item in goodsCategorys" :key="item.pk" type="info" :effect="seleteCategoryId==item.pk?dark:plain" @click="seleteCategoryId=item.pk">{{item.fields.name}}</el-tag>
+            <el-tag
+              v-for="item in goodsCategorys"
+              :key="item.pk"
+              type="info"
+              :effect="seleteCategoryId==item.pk?dark:plain"
+              @click="seleteCategoryId=item.pk"
+            >{{item.fields.name}}</el-tag>
           </el-form-item>
         </el-form>
         <div class="drawer__footer">
@@ -233,36 +241,58 @@ export default {
       this.$store.commit("loginOut");
     },
     pushLogin(done) {
+      console.log("login");
+      this.dialog1 = false;
+
+      // this.$http
+      // .post(
+      //   "api/customer_login",
+      //   {
+      //     phone: this.loginForm.phone,
+      //     pswd: this.loginForm.password
+      //   },
+      //   { emulateJSON: true }
+      // )
+      // .then(result => {
+      //   console.log(result);
+      // if (result.body.error_num == 0) {
+      //   this.dialog1 = false;
+      //   this.$store.commit("loginIn", );
+      //   this.$message({
+      //     type: "info",
+      //     message: "登陆成功"
+      //   });
+      // } else {
+      //   this.dialog1 = false;
+      //   this.$message({
+      //     type: "error",
+      //     message: "登陆失败"
+      //   });
+      // }
+      // });
       // this.$confirm("确定要登陆吗？")
-      // .then(_ => {
-      //   this.loading1 = true;
+      //   .then(_ => {
+      //     console.log("123213");
+
+      //     this.loading1 = true;
       //   this.$http
-      //     .get(
-      //       "api/register_account?mobile_phone=" +
-      //         this.form.mobilePhone +
-      //         "&sex=" +
-      //         this.form.sex +
-      //         "&nickname=" +
-      //         this.form.nickName +
-      //         "&passport=" +
-      //         this.form.passport +
-      //         "&password=" +
-      //         this.form.password +
-      //         "&avatar=" +
-      //         this.form.avatar
-      //     )
+      //     .post("api/customer_login", {
+      //       phone: this.loginForm.phone,
+      //       pswd: this.loginForm.password
+      //     },{emulateJSON:true})
       //     .then(result => {
-      //       // console.log(result);
+      //       this.dialog1 = false;
+      //       console.log(result);
       //       if (result.body.error_num == 0) {
       //         this.$store.dispatch("userLogin", true);
       //         localStorage.setItem("Flag", "isLogin");
-      //         this.loading = false;
+      //         this.loading1 = false;
       //         this.$message({
       //           type: "info",
       //           message: "登陆成功"
       //         });
       //       } else {
-      //         this.loading = false;
+      //         this.loading1 = false;
       //         this.$message({
       //           type: "error",
       //           message: "登陆失败"
@@ -271,19 +301,19 @@ export default {
       //     });
       // })
       // .catch(_ => {
-      //   this.dialog = false;
+      //   this.dialog1 = false;
       //   this.$message({
       //     type: "info",
       //     message: "已取消登录"
       //   });
       // });
-      this.dialog1 = false;
-      this.loading1 = false;
+      // this.dialog1 = false;
+      // this.loading1 = false;
       var user = {
-        uid: 1,
-        nickName: "para",
-        sex: "男",
-        phone: "19850052217"
+        uid: 16,
+        nickName: "111",
+        sex: "0",
+        phone: "111"
       };
       this.$store.commit("loginIn", user);
     },
@@ -311,7 +341,7 @@ export default {
   },
   data() {
     return {
-      seleteCategoryId:'',
+      seleteCategoryId: "",
       goodsCategorys: [],
       activeIndex: "1",
       activeIndex2: "1",
@@ -329,7 +359,7 @@ export default {
         password: ""
       },
       loginForm: {
-        nickName: "",
+        phone: "",
         password: ""
       },
       newFood: {

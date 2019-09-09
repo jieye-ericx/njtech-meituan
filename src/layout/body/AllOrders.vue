@@ -17,7 +17,8 @@ export default {
   props: {},
   data() {
     return {
-      tableData: []
+      tableData: [ 
+      ]
     };
   },
   methods: {}
