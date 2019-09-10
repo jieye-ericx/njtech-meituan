@@ -2,7 +2,7 @@
   <div>
     <div>
       <MainHeader></MainHeader>
-      <Footer></Footer>
+      <!-- <Footer></Footer> -->
     </div>
   </div>
 </template>
@@ -20,12 +20,18 @@ import Footer from "@/layout/footer/Footer.vue";
 
 export default {
   data() {
-    return {};
+    return {
+      nowHeight:window.innerHeight
+    };
   },
   components: {
     MainHeader,
     Footer,
   },
-  methods: {}
+  methods: {},
+  computed:{
+  },
+  watch:{
+  }
 };
 </script>

@@ -1,14 +1,14 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="16" :offset="3">
+      <el-col :span="16" :offset="4">
         <!-- <h1 style="text-align:left;margin-bottom:0;">团购详情</h1> -->
         <el-page-header @back="goBack" content="团购详情" style="margin-top:30px;"></el-page-header>
         <el-divider content-position="left">工大美团</el-divider>
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="8" :offset="3" style="text-align:left">
+      <el-col :span="6" :offset="4" style="text-align:left">
         <h1 style="text-align:left;margin-bottom:0;">{{foodInfo.name}}</h1>
         <h2 style="margin-top:5px;">RMB {{foodInfo.amount_money}}</h2>
         <el-tag type="info">{{foodInfo.category_id}}</el-tag>
@@ -17,19 +17,16 @@
           <el-button type="primary" plain size="small" style="height:80%;" @click="addToCart">加入购物袋</el-button>
         </div>
       </el-col>
-      <el-col :span="12" :push="3">
+      <el-col :span="12" :push="2">
         <el-carousel :interval="4000" type="card" height="200px" arrow="never">
-          <el-carousel-item v-for="item in 4" :key="item">
-            <img
-              :src="foodInfo.url1"
-              alt
-            />
+          <el-carousel-item v-for="(item) in foodInfo.urluse" :key="item">
+            <img :src="item" alt />
           </el-carousel-item>
         </el-carousel>
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="20" :offset="3" style="margin-top:80px;">
+      <el-col :span="16" :offset="4" style="margin-top:80px;">
         <el-collapse>
           <el-collapse-item title="查看详情" name="1">
             <div>{{foodInfo.introduction}}</div>
@@ -72,18 +69,21 @@ export default {
       this.$router.go(-1);
     },
     addToCart() {
-      var user =
-        this.$store.getters.userInfo
-      if (-1 == user) {
+      // var user =
+      // this.$store.getters.userInfo
+      console.log(this.$store.getters.isLogin);
+      if (!this.$store.getters.isLogin) {
         this.$message({
           type: "error",
           message: "请先登录"
         });
         return;
       }
+      console.log(2);
+
       // console.log(user)
       var cartRecord = {
-        uid: user.uid,
+        // uid: user.uid,
         id: this.$route.params.id,
         isSelected: true,
         quantity: this.num,

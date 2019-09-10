@@ -1,23 +1,37 @@
 <template>
   <div>
     <el-row style="margin-top:25px;">
-      <el-col :span="16" :offset="5">
+      <el-col :span="16" :offset="4">
         <el-table :data="tableData" stripe style="width: 100%">
-          <el-table-column prop="name" label="团购名称" width="180"></el-table-column>
-          <el-table-column prop="num" label="数量" width="60"></el-table-column>
-          <el-table-column prop="date" label="时间" width="180"></el-table-column>
-          <el-table-column prop="remark" label="备注" width="180"></el-table-column>
-          <el-table-column prop="total" label="金额 RMB" width="110"></el-table-column>
-          <el-table-column width="180">
+          <el-table-column  label="团购名称" width="180">
             <template slot-scope="scope">
-              <div v-if="isLogin&&!isManager">
+              <span style="margin-left: 10px">{{ scope.row.fields.foodname }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column  label="数量" width="60">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.quantity }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column  label="备注" width="180">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.remarks }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column  label="金额 RMB" width="110">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.amount_money }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column  label="时间" width="210">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.order_time|dateFormat }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="180">
+            <template slot-scope="scope">
+              <div>
                 <el-button size="mini" @click="sendComplaint(scope.$index, scope.row)">投诉</el-button>
-              </div>
-              <div v-if="isManager">
-                <el-button
-                  size="mini"
-                  @click="deleteOrder(scope.$index, scope.row)"
-                >删除</el-button>
               </div>
             </template>
           </el-table-column>
@@ -42,37 +56,37 @@
 <script>
 export default {
   props: {},
-  created(){
-    console.log(this.$store.getters.isLogin);
+  created() {
+    this.getOrders();
   },
   data() {
     return {
-      tableData: [
-      ],
+      tableData: [],
       dialogFormVisible: false,
       formLabelWidth: "120px",
       form: {
         content: "",
-        purchase_order_id: ""
+        purchase_order_id: "",
+        uid:''
       }
     };
   },
-  computed:{
-    isLogin: function () {
-      return this.$store.getters.isLogin
+  computed: {
+    isLogin: function() {
+      return this.$store.getters.isLogin;
     },
-    isManager:function () {
-      return this.$store.getters.isManager
+    isManager: function() {
+      return this.$store.getters.isManager;
     }
   },
   methods: {
     sendComplaint(index, row) {
       this.dialogFormVisible = true;
-      // console.log(index, row);
-      this.form.purchase_order_id = row.id;
+      this.form.purchase_order_id = row.pk;
     },
     clickOk() {
       this.dialogFormVisible = false;
+      this.form.uid=this.$store.getters.userInfo.uid
       this.$http
         .get(
           "api/add_complaints?purchase_order_id=" +
@@ -83,27 +97,37 @@ export default {
             this.form.content
         )
         .then(result => {
+          console.log(result);
+          
           if (result.body.error_num == 0) {
             this.$message({
               duration: 1000,
-
               type: "info",
-              message: "添加成功"
+              message: "投诉成功"
             });
           } else {
             this.$message({
               duration: 1000,
-
               type: "error",
               message: "出错"
             });
           }
         });
     },
-    deleteOrder(){
-    },
-    getOrders(){
-      // this.$http.get('api/')
+    getOrders() {
+      this.$http
+        .get("api/get_customer_order?id=" + this.$store.getters.userInfo.uid)
+        .then(result => {
+          if (result.body.error_num === 0) {
+            this.tableData = result.body.list;
+          } else {
+            this.$message({
+              duration: 1000,
+              type: "error",
+              message: "出错"
+            });
+          }
+        });
     }
   }
 };

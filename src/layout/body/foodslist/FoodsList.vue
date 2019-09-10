@@ -16,10 +16,18 @@
     <el-main>
       <router-link :to="'/foodinfo/'+good.id" tag="div" v-for="(good) in foodsList" :key="good.id">
         <el-card :body-style="{ padding: '1px' }">
-          <img :src="good.picUrl1" class="image" />
+          <div class="image-container">
+            <img :src="good.picUrl1" class="image" alt="呀 图片丢失了" />
+          </div>
           <div>
             <div class="name-price">
               <span class="s-name">{{good.name}}</span>
+              <el-button
+                v-if="isManager"
+                type="danger"
+                style="width:100px;height:20px;line-height:1px;"
+                @click="deleteFood(good.id)"
+              >删除</el-button>
               <span class="s-price">¥{{good.amount_money}}</span>
             </div>
             <div class="category-more">
@@ -29,7 +37,6 @@
           </div>
         </el-card>
       </router-link>
-      <el-pagination layout="prev, pager, next" :page-size="20" ></el-pagination>
     </el-main>
   </el-container>
 </template>
@@ -42,10 +49,11 @@ export default {
   },
   data() {
     return {
+      isManager: this.$store.getters.isManager,
       foodsList: [],
       AllFoodsCategory: [],
       page: 1,
-      nowCategoryId:0
+      nowCategoryId: 0
     };
   },
   methods: {
@@ -63,7 +71,7 @@ export default {
       });
     },
     getAllFoods() {
-      this.nowCategoryId=0
+      this.nowCategoryId = 0;
       this.$http.get("api/get_page_food?page=" + this.page).then(result => {
         this.foodsList = [];
         result.body.list.forEach(element => {
@@ -74,16 +82,41 @@ export default {
       });
     },
     getFoodsByCategory(id) {
-      this.nowCategoryId=id
-      this.page=1
-      this.$http.get("api/get_page_food_by_category?page=" + this.page+"&category_id="+id).then(result => {
-        this.foodsList = [];
-        result.body.list.forEach(element => {
-          var obj = element.fields;
-          obj.id = element.pk;
-          this.foodsList.push(obj);
+      this.nowCategoryId = id;
+      this.page = 1;
+      this.$http
+        .get(
+          "api/get_page_food_by_category?page=" +
+            this.page +
+            "&category_id=" +
+            id
+        )
+        .then(result => {
+          this.foodsList = [];
+          result.body.list.forEach(element => {
+            var obj = element.fields;
+            obj.id = element.pk;
+            this.foodsList.push(obj);
+          });
         });
+    },
+    deleteFood(id) {
+      this.$http.get("api/delete_food?foodid=" + id).then(result => {
+        if (result.body.error_num == 0) {
+          this.$message({
+            duration: 1000,
+            type: "info",
+            message: "删除成功"
+          });
+        } else {
+          this.$message({
+            duration: 1000,
+            type: "error",
+            message: "删除失败"
+          });
+        }
       });
+      this.$route.go(0)
     }
   }
 };
@@ -138,6 +171,17 @@ export default {
     height: 290px;
     flex-direction: column;
     justify-content: space-between;
+    .image-container {
+      width: 218px;
+      height: 221px;
+      img {
+        width: auto;
+        text-align: center;
+        height: 221px;
+        overflow: hidden;
+      }
+    }
+
     .name-price {
       display: flex;
       justify-content: space-between;

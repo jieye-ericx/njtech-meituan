@@ -28,15 +28,18 @@ var store = new Vuex.Store({
       if (flag) {
         state.cart.push(newObj)
       }
+      console.log('uid:'+state.loginState.user.uid);
+      
       const vueObj = new Vue()
       vueObj.$http.get('api/add_shopping_cart_content?customer_id=' +
-        newObj.uid +
+        state.loginState.user.uid +
         '&food_id=' +
         newObj.id +
         '&quantity=' +
         newObj.quantity +
         '&amount_money=' +
-        newObj.price
+        newObj.price+
+        '&isselected=true'
       ).then(result => {
         console.log('添加购物车时发送的请求' + result)
         if (result.body.error_num == 0) {

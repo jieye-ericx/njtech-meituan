@@ -1,16 +1,41 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="16" :offset="3">
+      <el-col :span="16" :offset="5">
         <el-table :data="tableData" stripe style="width: 100%">
-          <el-table-column prop="name" label="用户名" width="180"></el-table-column>
-          <el-table-column prop="phone" label="电话" width="180"></el-table-column>
-          <el-table-column prop="sex" label="性别" width="180"></el-table-column>
-          <el-table-column prop="passport" label="身份证" width="180"></el-table-column>
-          <el-table-column prop="create_time" label="创建时间"></el-table-column>
+          <el-table-column label="用户名" width="180">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.nickname }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="电话" width="100">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.mobile_phone }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="性别" width="60">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.sex==1? "男":"女" }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="身份证" width="180">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.passport }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.create_time|dateFormat }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态">
+            <template slot-scope="scope">
+              <span>{{ scope.row.fields.isdeleted==1? "已删除":"正常"}}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              <el-button :disabled="scope.row.fields.isdeleted==1" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -34,7 +59,8 @@ export default {
           phone: "",
           sex: "",
           passport: "",
-          create_time: ""
+          create_time: "",
+          isdelete: ""
         }
       ]
     };
@@ -56,9 +82,12 @@ export default {
       });
     },
     handleDelete(index, row) {
+      console.log(row);
       this.$http
-        .get("api/delete_customer?mobile_phone=" + row.phone)
+        .get("api/delete_customer?mobile_phone=" + row.fields.mobile_phone)
         .then(result => {
+          console.log(result);
+          
           if (result.body.error_num === 0) {
             this.$message({
               duration: 1000,

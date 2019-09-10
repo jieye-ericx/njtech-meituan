@@ -9,7 +9,7 @@
         background-color="#323232"
         text-color="#fff"
         active-text-color="rgb(181,181,181)"
-        style="height:44px;margin-left:20%;"
+        style="height:44px;margin-left:15%;"
       >
         <el-menu-item index="0">
           <router-link to="/foodslist" tag="div">
@@ -124,8 +124,8 @@
     </el-drawer>
 
     <el-drawer
+      :open="openAddFoodDrawer"
       title="添加团购"
-      :before-close="pushNewFood"
       :visible.sync="AddFoodDialog"
       direction="ttb"
       custom-class="register-drawer"
@@ -168,7 +168,7 @@
         </el-form>
         <div class="drawer__footer">
           <el-button @click="AddFoodDialog = false">取 消</el-button>
-          <el-button type="primary" @click="$refs.drawer.closeDrawer()">提交</el-button>
+          <el-button type="primary" @click="pushNewFood">提交</el-button>
         </div>
       </div>
     </el-drawer>
@@ -241,83 +241,44 @@ export default {
       this.$store.commit("loginOut");
     },
     pushLogin(done) {
-      console.log("login");
+      // console.log("login");
       this.dialog1 = false;
 
-      // this.$http
-      // .post(
-      //   "api/customer_login",
-      //   {
-      //     phone: this.loginForm.phone,
-      //     pswd: this.loginForm.password
-      //   },
-      //   { emulateJSON: true }
-      // )
-      // .then(result => {
-      //   console.log(result);
-      // if (result.body.error_num == 0) {
-      //   this.dialog1 = false;
-      //   this.$store.commit("loginIn", );
-      //   this.$message({
-      //     type: "info",
-      //     message: "登陆成功"
-      //   });
-      // } else {
-      //   this.dialog1 = false;
-      //   this.$message({
-      //     type: "error",
-      //     message: "登陆失败"
-      //   });
-      // }
-      // });
-      // this.$confirm("确定要登陆吗？")
-      //   .then(_ => {
-      //     console.log("123213");
-
-      //     this.loading1 = true;
-      //   this.$http
-      //     .post("api/customer_login", {
-      //       phone: this.loginForm.phone,
-      //       pswd: this.loginForm.password
-      //     },{emulateJSON:true})
-      //     .then(result => {
-      //       this.dialog1 = false;
-      //       console.log(result);
-      //       if (result.body.error_num == 0) {
-      //         this.$store.dispatch("userLogin", true);
-      //         localStorage.setItem("Flag", "isLogin");
-      //         this.loading1 = false;
-      //         this.$message({
-      //           type: "info",
-      //           message: "登陆成功"
-      //         });
-      //       } else {
-      //         this.loading1 = false;
-      //         this.$message({
-      //           type: "error",
-      //           message: "登陆失败"
-      //         });
-      //       }
-      //     });
-      // })
-      // .catch(_ => {
-      //   this.dialog1 = false;
-      //   this.$message({
-      //     type: "info",
-      //     message: "已取消登录"
-      //   });
-      // });
-      // this.dialog1 = false;
-      // this.loading1 = false;
-      var user = {
-        uid: 16,
-        nickName: "111",
-        sex: "0",
-        phone: "111"
-      };
-      this.$store.commit("loginIn", user);
+      this.$http
+        .post(
+          "api/customer_login",
+          {
+            userphone: this.loginForm.phone,
+            pswd: this.loginForm.password
+          },
+          { emulateJSON: true }
+        )
+        .then(result => {
+          // console.log(result);
+          if (result.body.error_num === 0) {
+            this.dialog1 = false;
+            var user={}
+            user.uid=result.body.id
+            user.nickName=result.body.name
+            user.sex=result.body.sex
+            user.phone=result.body.phone
+            user.passport=result.body.passport
+            user.isDelete=result.body.isdelete
+            this.$store.commit("loginIn", user);
+            this.$message({
+              type: "info",
+              message: "登陆成功"
+            });
+          } else {
+            this.dialog1 = false;
+            this.$message({
+              type: "error",
+              message: "登陆失败"
+            });
+          }
+        });
+      
     },
-    pushNewFood() {},
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
@@ -337,6 +298,12 @@ export default {
           });
         }
       });
+    },
+    openAddFoodDrawer(){
+      this.getCategorys()
+    },
+    pushNewFood(){
+      this.AddFoodDialog=false
     }
   },
   data() {
