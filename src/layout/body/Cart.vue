@@ -51,7 +51,11 @@
               <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>-->
             </template>
           </el-table-column>
-          <el-table-column></el-table-column>
+          <el-table-column label="备注" width="100">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.remarks" placeholder="请输入备注"></el-input>
+            </template>
+          </el-table-column>
         </el-table>
       </el-col>
     </el-row>
@@ -78,14 +82,7 @@
 export default {
   data() {
     return {
-      tableData: [
-        {
-          isselected: true,
-          foodname: "2323",
-          quantity: "21",
-          unit_price: "21323"
-        }
-      ],
+      tableData: [],
       minNum: 1
     };
   },
@@ -131,7 +128,8 @@ export default {
                 "&quantity=" +
                 element.quantity +
                 "&cartid=" +
-                element.id
+                element.id+
+                "&remarks="+element.remarks
             )
             .then(result => {
               console.log(result);
@@ -170,65 +168,73 @@ export default {
         });
     },
     numberChange(row) {
-      this.$http
-        .get("api/add_shopping_cart_content?customer_id=" +
-            this.$store.getters.userInfo.uid +
-            "&food_id=" +
-            row.food_id +
-            "&quantity=" +
-            row.quantity +
-            "&amount_money=" +
-            row.price+
-            "&isselected="+
-            row.isselected
-        )
-        .then(result => {
-          console.log("添加购物车时发送的请求" + result);
-          if (result.body.error_num == 0) {
-            vueObj.$message({
-              duration: 1000,
-              type: "info",
-              message: "添加成功"
-            });
-          } else {
-            vueObj.$message({
-              duration: 1000,
-              type: "error",
-              message: "出错"
-            });
-          }
-        });
+      var url =
+        "api/add_shopping_cart_content?customer_id=" +
+        this.$store.getters.userInfo.uid +
+        "&food_id=" +
+        row.food_id +
+        "&quantity=" +
+        row.quantity +
+        "&remarks="+
+        row.remarks+
+        "&amount_money=" +
+        row.unit_price +
+        "&isselected=";
+      if (row.isselected === true) url += "True";
+      else url += "False";
+      // console.log(url);
+
+      this.$http.get(url).then(result => {
+        console.log("添加购物车时发送的请求" + result);
+        // if (result.body.error_num == 0) {
+        //   this.$message({
+        //     duration: 1000,
+        //     type: "info",
+        //     message: "更新成功"
+        //   });
+        // } else {
+        //   this.$message({
+        //     duration: 1000,
+        //     type: "error",
+        //     message: "出错"
+        //   });
+        // }
+      });
     },
     selectChange(row) {
       // console.log(row);
-      this.$http
-        .get("api/add_shopping_cart_content?customer_id=" +
-            this.$store.getters.userInfo.uid +
-            "&food_id=" +
-            row.food_id +
-            "&quantity=" +
-            row.quantity +
-            "&amount_money=" +
-            row.price+
-            "&isselected="+
-            row.isselected
-        )
-        .then(result => {
-          console.log("添加购物车时发送的请求" + result);
-          if (result.body.error_num == 0) {
-            vueObj.$message({
-              duration: 1000,
-              type: "info",
-              message: "添加成功"
-            });
-          } else {
-            vueObj.$message({
-              duration: 1000,
-              type: "error",
-              message: "出错"
-            });
-          }
-        });
+      var url =
+        "api/add_shopping_cart_content?customer_id=" +
+        this.$store.getters.userInfo.uid +
+        "&food_id=" +
+        row.food_id +
+        "&quantity=" +
+        row.quantity +
+        "&remarks="+
+        row.remarks+
+        "&amount_money=" +
+        row.unit_price +
+        "&isselected=";
+      if (row.isselected === true) url += "True";
+      else url += "False";
+      // console.log(url);
+
+      this.$http.get(url).then(result => {
+        console.log("添加购物车时发送的请求" + result);
+        if (result.body.error_num == 0) {
+          this.$message({
+            duration: 1000,
+            type: "info",
+            message: "更新成功"
+          });
+        } else {
+          this.$message({
+            duration: 1000,
+            type: "error",
+            message: "出错"
+          });
+        }
+      });
     }
   }
 };

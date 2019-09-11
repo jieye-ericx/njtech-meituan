@@ -8,6 +8,7 @@ import FoodInfo from '@/layout/body/foodslist/FoodInfo.vue'
 import ManagerLogin from '@/layout/body/ManagerLogin.vue'
 import AllUsers from '@/layout/body/AllUsers.vue'
 import AllOrders from '@/layout/body/AllOrders.vue'
+import AllComs from '@/layout/body/AllComs.vue'
 Vue.use(Router)
 export default new Router({
   routes: [
@@ -52,7 +53,11 @@ export default new Router({
       path: '/allorders', component: AllOrders, meta: {
         needLogin: true
       }
+    },
+    {
+      path: '/allcoms', component: AllComs, meta: {
+        needLogin: true
+      }
     }
-
   ]
 })
