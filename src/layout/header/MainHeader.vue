@@ -50,6 +50,13 @@
             <span @click="AddFoodDialog=true">添加团购</span>
           </div>
         </el-menu-item>
+        <el-menu-item index="5">
+          <div v-if="this.$store.getters.isLogin&&this.$store.getters.isManager">
+            <router-link to="/allcoms" tag="div">
+            <span >所有投诉</span>
+            </router-link>
+          </div>
+        </el-menu-item>
         <div v-if="!this.$store.getters.isLogin&&!this.$store.getters.isManager">
           <span class="login-register" @click="dialog1 = true">登录</span>
           <span class="login-register">|</span>
@@ -63,7 +70,6 @@
 
     <el-drawer
       title="欢迎注册工大美团"
-      :before-close="pushRegeistr"
       :visible.sync="dialog"
       direction="rtl"
       custom-class="register-drawer"
@@ -92,9 +98,8 @@
           <el-button @click="dialog = false">取 消</el-button>
           <el-button
             type="primary"
-            @click="$refs.drawer.closeDrawer()"
-            :loading="loading"
-          >{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+            @click="pushRegeistr"
+          >确 定</el-button>
         </div>
       </div>
     </el-drawer>
@@ -112,8 +117,8 @@
           <el-form-item label="手机号" :label-width="formLabelWidth">
             <el-input v-model="loginForm.phone" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="密码" :label-width="formLabelWidth">
-            <el-input v-model="loginForm.password" autocomplete="off"></el-input>
+          <el-form-item label="密码" prop="pass" :label-width="formLabelWidth">
+            <el-input type="password" v-model="loginForm.password" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
         <div class="drawer__footer">
@@ -136,10 +141,11 @@
         <el-form :model="newFood">
           <el-form-item>
             <el-upload
-              action="https://jsonplaceholder.typicode.com/posts/"
+              action="http://10.22.252.59:8080/api/upload_pic"
               list-type="picture-card"
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
+              :on-success="uploadSuccess"
             >
               <i class="el-icon-plus"></i>
             </el-upload>
@@ -158,11 +164,12 @@
           </el-form-item>
           <el-form-item label="类别" :label-width="formLabelWidth">
             <el-tag
+              style="padding:1px;"
               v-for="item in goodsCategorys"
               :key="item.pk"
               type="info"
-              :effect="seleteCategoryId==item.pk?dark:plain"
-              @click="seleteCategoryId=item.pk"
+              :effect="newFood.cateid==item.pk?'dark':'plain'"
+              @click="newFood.cateid=item.pk"
             >{{item.fields.name}}</el-tag>
           </el-form-item>
         </el-form>
@@ -183,58 +190,51 @@ import { log } from "util";
 import Cookies from "js-cookie";
 
 export default {
+  created() {
+    this.getCategorys();
+  },
   methods: {
+    uploadSuccess(response, file, fileList) {
+      console.log(response);
+      this.newFood.urls.push(response.path);
+    },
     handleSelect(key, keyPath) {
       // console.log(key, keyPath);
     },
     pushRegeistr(done) {
-      this.$confirm("确定要提交表单吗？")
-        .then(_ => {
-          this.loading = true;
-          this.$http
-            .get(
-              "api/register_account?mobile_phone=" +
-                this.form.mobilePhone +
-                "&sex=" +
-                this.form.sex +
-                "&nickname=" +
-                this.form.nickName +
-                "&passport=" +
-                this.form.passport +
-                "&password=" +
-                this.form.password +
-                "&avatar=" +
-                this.form.avatar
-            )
-            .then(result => {
-              // console.log(result);
-              if (result.body.error_num == 0) {
-                this.loading = false;
-                this.$message({
-                  duration: 1000,
-
-                  type: "info",
-                  message: "注册成功，请登录"
-                });
-              } else {
-                this.loading = false;
-                this.$message({
-                  duration: 1000,
-
-                  type: "info",
-                  message: "注册不成功，请重试"
-                });
-              }
+      console.log(987);
+      this.$http
+        .get(
+          "api/register_account?mobile_phone=" +
+            this.registerForm.mobilePhone +
+            "&sex=" +
+            this.registerForm.sex +
+            "&nickname=" +
+            this.registerForm.nickName +
+            "&passport=" +
+            this.registerForm.passport +
+            "&password=" +
+            this.registerForm.password +
+            "&avatar=" +
+            this.registerForm.avatar
+        )
+        .then(result => {
+          // console.log(result);
+          if (result.body.error_num == 0) {
+            this.dialog=false
+            this.$message({
+              duration: 1000,
+              type: "info",
+              message: "注册成功，请登录"
             });
-        })
-        .catch(_ => {
-          this.dialog = false;
-          this.$message({
-            duration: 1000,
-
-            type: "info",
-            message: "已取消注册"
-          });
+          } else {
+            this.dialog=false
+            this.$message({
+              duration: 1000,
+              type: "error",
+              message: "注册不成功，请重试"
+            });
+          }
         });
     },
     quit() {
@@ -257,13 +257,13 @@ export default {
           // console.log(result);
           if (result.body.error_num === 0) {
             this.dialog1 = false;
-            var user={}
-            user.uid=result.body.id
-            user.nickName=result.body.name
-            user.sex=result.body.sex
-            user.phone=result.body.phone
-            user.passport=result.body.passport
-            user.isDelete=result.body.isdelete
+            var user = {};
+            user.uid = result.body.id;
+            user.nickName = result.body.name;
+            user.sex = result.body.sex;
+            user.phone = result.body.phone;
+            user.passport = result.body.passport;
+            user.isDelete = result.body.isdelete;
             this.$store.commit("loginIn", user);
             this.$message({
               type: "info",
@@ -277,7 +277,6 @@ export default {
             });
           }
         });
-      
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
@@ -299,11 +298,33 @@ export default {
         }
       });
     },
-    openAddFoodDrawer(){
-      this.getCategorys()
+    openAddFoodDrawer() {
+      this.getCategorys();
     },
-    pushNewFood(){
-      this.AddFoodDialog=false
+    pushNewFood() {
+      this.AddFoodDialog = false;
+      this.$http.get(
+        "api/add_food_variety?category_id=" +
+          this.newFood.cateid +
+          "&name=" +
+          this.newFood.name +
+          "&amount_money=" +
+          this.newFood.price +
+          "&introduction=" +
+          this.newFood.details +
+          "&add_time=" +
+          new Date() +
+          "&stop_time=" +
+          new Date() +
+          "&url1=" +
+          this.newFood.urls[0] +
+          "&url2=" +
+          this.newFood.urls[1] +
+          "&url3=" +
+          this.newFood.urls[2] +
+          "&url4=" +
+          this.newFood.urls[3]
+      );
     }
   },
   data() {
@@ -318,7 +339,6 @@ export default {
       dialog1: false,
       AddFoodDialog: false,
       registerForm: {
-        avatar: "1",
         nickName: "",
         sex: "",
         mobilePhone: "",
@@ -330,9 +350,11 @@ export default {
         password: ""
       },
       newFood: {
+        cateid: "",
         name: "",
         details: "",
-        price: ""
+        price: "",
+        urls: []
       },
       formLabelWidth: "70px",
       dialogImageUrl: "",

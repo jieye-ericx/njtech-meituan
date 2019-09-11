@@ -39,7 +39,8 @@ var store = new Vuex.Store({
         newObj.quantity +
         '&amount_money=' +
         newObj.price+
-        '&isselected=true'
+        '&isselected=True'+
+        '&remarks=null'
       ).then(result => {
         console.log('添加购物车时发送的请求' + result)
         if (result.body.error_num == 0) {

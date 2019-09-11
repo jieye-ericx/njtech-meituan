@@ -85,7 +85,7 @@ export default {
       var cartRecord = {
         // uid: user.uid,
         id: this.$route.params.id,
-        isSelected: true,
+        isSelected:1,
         quantity: this.num,
         price: this.foodInfo.amount_money,
         time: new Date()

@@ -22,12 +22,13 @@
           <div>
             <div class="name-price">
               <span class="s-name">{{good.name}}</span>
-              <el-button
-                v-if="isManager"
-                type="danger"
-                style="width:100px;height:20px;line-height:1px;"
-                @click="deleteFood(good.id)"
-              >删除</el-button>
+              <div v-if="ism">
+                <el-button
+                  type="danger"
+                  style="width:100px;height:20px;line-height:1px;"
+                  @click="deleteFood(good.id)"
+                >删除</el-button>
+              </div>
               <span class="s-price">¥{{good.amount_money}}</span>
             </div>
             <div class="category-more">
@@ -37,6 +38,18 @@
           </div>
         </el-card>
       </router-link>
+      <el-row>
+        <el-col :span="16" :offset="7">
+          <el-pagination
+          v-if="nowCategoryId==0"
+            @current-change="pageChange"
+            @prev-change="pageChange"
+            @next-change="pageChange"
+            :page-count="pageNum"
+            layout="prev, pager, next"
+          ></el-pagination>
+        </el-col>
+      </el-row>
     </el-main>
   </el-container>
 </template>
@@ -46,17 +59,38 @@ export default {
   created() {
     this.getAllFoodsCategory();
     this.getAllFoods();
+    this.getPageNum();
   },
   data() {
     return {
-      isManager: this.$store.getters.isManager,
       foodsList: [],
       AllFoodsCategory: [],
       page: 1,
-      nowCategoryId: 0
+      nowCategoryId: 0,
+      pageNum: 0
     };
   },
+  computed: {
+    // isManager: this.$store.getters.isManager
+
+    ism() {
+      return this.$store.state.isManager;
+    }
+  },
   methods: {
+    getPageNum() {
+      this.$http.get("api/get_all_page").then(result => {
+        if (result.body.error_num == 0) {
+          this.pageNum = result.body.allPage;
+        } else {
+          this.$message({
+            duration: 1000,
+            type: "error",
+            message: "获取页数不成功，请重试"
+          });
+        }
+      });
+    },
     getAllFoodsCategory() {
       this.$http.get("api/get_all_food_category").then(result => {
         if (result.body.error_num == 0) {
@@ -116,7 +150,12 @@ export default {
           });
         }
       });
-      this.$route.go(0)
+      this.$route.go(0);
+    },
+    pageChange(val) {
+      console.log(val);
+      this.page=val
+      this.getAllFoods()
     }
   }
 };
