@@ -1,0 +1,38 @@
+账户注册register_account 参数mobile_phone sex nickname passport password
+增加订单add_purchase_order 参数food_id  customer_id remarks amount_money quantity
+增加食物种类add_food_variety 参数category_id name amount_money introduction add_time stop_time
+增加食物品种（川菜） add_food_category_variety 参数name remarks
+
+增加购物车内容 add_shopping_cart_content 参数customer_id food_id quantity  amount_money
+
+增加管理 add_admin 参数name password
+增加投诉 add_complaints 参数purchase_order_id customer_id content
+得到食物具体信息 get_food_info 参数id
+得到食物种类（川菜） get_all_food_category 参数无
+得到食物种类（川菜）的具体信息 get_food_category_info 参数id
+
+得到食物具体页数（不分菜种大类） get_page_food 参数page 
+得到食物具体页数（分菜种大类）get_page_food_by_category 参数page category_id
+得到某用户的购物车 get_shopping_cart_content 参数id
+
+得到某用户订单 get_customer_order 参数id
+得到所有用户订单get_all_order 参数无
+
+
+获取页数 get_all_page 无参数 
+获取某种菜品页数 get_page_by_category 参数 category_id
+
+##################################
+删除购物车 delete_shopping_cart_content  参数userid foodid
+删除用户 delete_customer 参数mobile_phone
+删除食品 delete_food 参数foodid
+删除购物订单 delete_purchase_order 参数orderid
+删除食物种类 delete_food_category 参数category_id
+删除管理员 delete_admin 参数id
+删除评论 delete_complaints 参数id
+
+
+
+##################
+【POST】用户登录 customer_login 参数phone pswd 
+【POST】图片上传 upload_pic  参数就myfile文件 返回文件路径

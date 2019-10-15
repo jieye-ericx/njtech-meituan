@@ -112,3 +112,27 @@ npm run e2e
 # run all tests
 npm test
 ```
+
+
+## Back-end Build Setup
+```
+Environement:
+Python 3.6+
+Mysql 8.0+
+
+# install dependencies
+pip install Django pymysql json 
+
+# enter project
+cd njtech_meituan_app
+
+# make migrations
+python manage.py makemigreations back_end_app
+
+# migrate
+python manage.py migrate
+
+# back_end runserver
+python manage.py runserver
+
+```
